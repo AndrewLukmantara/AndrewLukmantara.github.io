@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Drew's portfolio: projects by Andrew Lukmantara, from hackathon apps to machine learning and quant research.">
+<title>Drew's Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a Figma-style canvas at night. Each section is a named "frame"; the hero frame holds a voxel house under the stars. */
+:root {
+  color-scheme: dark;
+  --night: #070e24;      /* page ground */
+  --navy: #0d1a3f;       /* frame fill */
+  --navy-2: #15275a;     /* raised surface */
+  --line: #24396f;       /* hairlines */
+  --white: #f3f6ff;      /* primary text */
+  --mist: #9fb0d6;       /* secondary text */
+  --glow: #8db4ff;       /* selection blue / accent */
+  --f-display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --f-body: "Instrument Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+}
+* { box-sizing: border-box; }
+html { background: var(--night); }
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--white);
+  font: 400 16px/1.6 var(--f-body);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: ""; position: fixed; inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--night);
+}
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--glow); outline-offset: 3px; border-radius: 4px; }
+.wrap {
+  max-width: 1180px; margin-inline: auto;
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r);
+}
+.mono { font-family: var(--f-mono); font-size: 12px; letter-spacing: .04em; }
+
+/* ---------- top bar ---------- */
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  background: color-mix(in srgb, var(--night) 78%, transparent);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 12px; }
+.file { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.file-mark { width: 22px; height: 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; flex: none; }
+.file-mark i { background: var(--white); border-radius: 2px; }
+.file-mark i:nth-child(2) { background: var(--glow); }
+.file-mark i:nth-child(3) { background: var(--navy-2); }
+.file-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--mist); }
+.file-name b { color: var(--white); font-weight: 500; }
+.tabs { display: flex; gap: 4px; }
+.tabs a {
+  text-decoration: none; padding: 6px 12px; border-radius: 6px; color: var(--mist);
+  transition: background .2s, color .2s;
+}
+.tabs a:hover { background: var(--navy-2); color: var(--white); }
+.say-hi {
+  text-decoration: none; background: var(--white); color: var(--night);
+  font-weight: 600; font-size: 14px; padding: 8px 14px; border-radius: 8px; white-space: nowrap;
+}
+@media (max-width: 720px) { .tabs { display: none; } }
+
+/* ---------- hero ---------- */
+.hero {
+  position: relative; overflow: hidden;
+  min-height: clamp(660px, 92vh, 900px);
+  background:
+    radial-gradient(60% 50% at 50% 78%, #183172 0%, transparent 70%),
+    linear-gradient(180deg, #050b1d 0%, var(--night) 45%, #0b1838 100%);
+  border-bottom: 1px solid var(--line);
+}
+#scene { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero-copy {
+  position: relative; z-index: 2; pointer-events: none;
+  padding-top: clamp(40px, 7vw, 72px);
+  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 22px;
+}
+.frame-tag { color: var(--glow); display: flex; align-items: center; gap: 8px; }
+.frame-tag::before { content: ""; width: 8px; height: 8px; border: 1.5px solid var(--glow); border-radius: 1px; }
+.sel { position: relative; padding: 6px 14px; }
+.sel::after {
+  content: ""; position: absolute; inset: 0; border: 1px solid var(--glow); pointer-events: none;
+}
+.sel .h {
+  position: absolute; width: 8px; height: 8px; background: var(--white);
+  border: 1px solid var(--glow); z-index: 1;
+}
+.h.tl { top: -4px; left: -4px; } .h.tr { top: -4px; right: -4px; }
+.h.bl { bottom: -4px; left: -4px; } .h.br { bottom: -4px; right: -4px; }
+.sel-size {
+  position: absolute; left: 50%; bottom: -30px; transform: translateX(-50%);
+  background: var(--glow); color: var(--night); padding: 2px 8px; border-radius: 4px;
+  font-family: var(--f-mono); font-size: 11px; white-space: nowrap;
+}
+h1 {
+  margin: 0; font-family: var(--f-display); font-weight: 800;
+  font-size: clamp(42px, 9vw, 116px); line-height: .95; letter-spacing: -.035em;
+  text-wrap: balance;
+}
+h1 .line { display: block; overflow: hidden; padding-bottom: .06em; }
+h1 .line > span { display: inline-block; }
+h1 em { font-style: normal; color: var(--glow); }
+.sub {
+  margin: 18px 0 0; font-family: var(--f-mono); font-size: clamp(13px, 1.6vw, 15px);
+  color: var(--mist); letter-spacing: .08em; text-transform: lowercase;
+}
+.sub span { color: var(--white); }
+.hero-foot {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; pointer-events: none;
+}
+.hero-foot .wrap { display: flex; justify-content: space-between; align-items: end; gap: 16px; padding-block: 22px; color: var(--mist); }
+.scroll-hint { display: flex; align-items: center; gap: 10px; }
+.scroll-hint i { width: 1px; height: 28px; background: linear-gradient(var(--glow), transparent); }
+.coords { font-variant-numeric: tabular-nums; }
+@media (max-width: 560px) { .coords { display: none; } }
+
+/* multiplayer cursor */
+.cursor {
+  position: absolute; z-index: 3; left: 0; top: 0; pointer-events: none;
+  display: flex; align-items: flex-start; gap: 2px; will-change: transform;
+}
+.cursor svg { width: 18px; height: 18px; }
+.cursor b {
+  margin-top: 14px; background: var(--glow); color: var(--night);
+  font: 600 12px/1 var(--f-body); padding: 5px 8px; border-radius: 0 8px 8px 8px;
+}
+
+/* ---------- marquee ---------- */
+.marquee { border-bottom: 1px solid var(--line); overflow: hidden; background: var(--navy); }
+.marquee-track { display: flex; width: max-content; padding-block: 14px; }
+.marquee-track span {
+  font-family: var(--f-display); font-weight: 500; font-size: 20px; color: var(--mist);
+  padding-inline: 22px; display: flex; align-items: center; gap: 44px; white-space: nowrap;
+}
+.marquee-track span::after { content: ""; width: 8px; height: 8px; background: var(--glow); }
+
+/* ---------- frames ---------- */
+section.frame { padding-block: clamp(64px, 9vw, 120px); }
+.frame-name { color: var(--mist); margin-bottom: 12px; display: flex; justify-content: space-between; gap: 12px; }
+.frame-name span:first-child { color: var(--glow); }
+.frame-box {
+  border: 1px solid var(--line); background: var(--navy); border-radius: 4px;
+  padding: clamp(22px, 4vw, 48px);
+}
+h2 {
+  margin: 0 0 28px; font-family: var(--f-display); font-weight: 800;
+  font-size: clamp(32px, 5vw, 56px); line-height: 1; letter-spacing: -.03em; text-wrap: balance;
+}
+
+/* projects */
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.card {
+  position: relative; display: flex; flex-direction: column; gap: 14px;
+  background: var(--night); border: 1px solid var(--line); border-radius: 4px;
+  padding: 22px; min-width: 0; text-decoration: none;
+  transition: border-color .25s, transform .25s;
+}
+.card:hover { border-color: var(--glow); transform: translateY(-4px); }
+.card-art {
+  aspect-ratio: 16 / 9; max-width: 100%; border-radius: 2px; overflow: hidden;
+  background: linear-gradient(160deg, var(--navy-2), var(--night));
+  display: grid; place-items: center; position: relative;
+}
+.card-art canvas { width: 100%; height: 100%; display: block; }
+.card-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; }
+.card h3 { overflow-wrap: anywhere; }
+.card h3 { margin: 0; font-family: var(--f-display); font-weight: 800; font-size: 24px; letter-spacing: -.02em; }
+.card .yr { color: var(--mist); font-variant-numeric: tabular-nums; }
+.card p { margin: 0; color: var(--mist); max-width: 52ch; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tags span {
+  font-family: var(--f-mono); font-size: 11px; color: var(--white);
+  border: 1px solid var(--line); padding: 3px 8px; border-radius: 999px;
+}
+
+/* about */
+.about { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 64px); }
+@media (max-width: 760px) { .about { grid-template-columns: minmax(0, 1fr); } }
+.about p { margin: 0 0 16px; font-size: 18px; max-width: 58ch; }
+.about p.dim { color: var(--mist); font-size: 16px; }
+.layers { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line); border-radius: 4px; background: var(--night); }
+.layers li {
+  display: flex; justify-content: space-between; gap: 12px; padding: 12px 14px;
+  border-bottom: 1px solid var(--line); font-size: 14px;
+}
+.layers li:last-child { border-bottom: 0; }
+.layers li span:first-child { display: flex; align-items: center; gap: 10px; }
+.layers li span:first-child::before { content: ""; width: 10px; height: 10px; border: 1.5px solid var(--glow); border-radius: 2px; }
+.layers li span:last-child { color: var(--mist); font-family: var(--f-mono); font-size: 12px; }
+.layers .head { color: var(--mist); font-family: var(--f-mono); font-size: 12px; }
+.layers .head span:first-child::before { display: none; }
+
+/* contact */
+.contact { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.contact h2 { font-size: clamp(44px, 9vw, 104px); margin: 0; }
+.contacts {
+  list-style: none; margin: 0; padding: 0; width: 100%; max-width: 640px;
+  border: 1px solid var(--line); border-radius: 4px; background: var(--night); text-align: left;
+}
+.contacts li {
+  display: grid; grid-template-columns: 84px minmax(0, 1fr) auto; align-items: center; gap: 14px;
+  padding: 12px 14px; border-bottom: 1px solid var(--line);
+}
+.contacts li:last-child { border-bottom: 0; }
+.c-label { color: var(--glow); }
+.contacts code {
+  font-family: var(--f-mono); font-size: clamp(13px, 2vw, 16px); user-select: all;
+  overflow-wrap: anywhere; min-width: 0;
+}
+@media (max-width: 480px) {
+  .contacts li { grid-template-columns: minmax(0, 1fr) auto; }
+  .c-label { grid-column: 1 / -1; }
+}
+.btn {
+  font: 600 13px var(--f-body); cursor: pointer; border: 1px solid var(--glow); text-decoration: none;
+  background: transparent; color: var(--white); padding: 8px 14px; border-radius: 6px; white-space: nowrap;
+}
+.btn:hover { background: var(--glow); color: var(--night); }
+
+footer { border-top: 1px solid var(--line); }
+footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-block: 24px; color: var(--mist); }
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .card:hover { transition: none; transform: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <div class="file">
+      <div class="file-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+      <div class="file-name mono">drafts / <b>drew-portfolio.fig</b></div>
+    </div>
+    <nav class="tabs mono" aria-label="Sections">
+      <a href="#projects">projects</a>
+      <a href="#about">about</a>
+      <a href="#contact">contact</a>
+    </nav>
+    <a class="say-hi" href="#contact">Say hi</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="top" aria-label="Intro">
+    <canvas id="scene" aria-label="A blocky voxel house on a floating island under the night sky"></canvas>
+    <div class="cursor" id="cursor" aria-hidden="true">
+      <svg viewBox="0 0 18 18"><path d="M2 1l13 6.5-6 1.6L6.3 15z" fill="#8db4ff" stroke="#070e24" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      <b>drew</b>
+    </div>
+    <div class="wrap hero-copy">
+      <div class="frame-tag mono">Frame · hero</div>
+      <div class="sel">
+        <i class="h tl"></i><i class="h tr"></i><i class="h bl"></i><i class="h br"></i>
+        <h1>
+          <span class="line"><span>i build <em>projects</em></span></span>
+          <span class="line"><span>for fun</span></span>
+        </h1>
+        <span class="sel-size">H1 · Hug × Hug</span>
+      </div>
+      <p class="sub"><span>drew's</span> portfolio</p>
+    </div>
+    <div class="hero-foot">
+      <div class="wrap mono">
+        <div class="scroll-hint"><i></i> scroll</div>
+        <div class="coords" id="coords">X 0 · Y 0 · 100%</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="marquee">
+      <span>python</span><span>typescript</span><span>swift</span><span>machine learning</span><span>hackathons</span><span>story games</span><span>late nights</span>
+      <span>python</span><span>typescript</span><span>swift</span><span>machine learning</span><span>hackathons</span><span>story games</span><span>late nights</span>
+    </div>
+  </div>
+
+  <section class="frame" id="projects">
+    <div class="wrap">
+      <div class="frame-name mono"><span>Frame · projects</span><span>6 repos</span></div>
+      <div class="frame-box">
+        <h2>things i made</h2>
+        <div class="grid">
+          <a class="card" href="https://github.com/AndrewLukmantara/CarbonMail" target="_blank" rel="noopener">
+            <div class="card-art"><canvas data-art="mail"></canvas></div>
+            <div class="card-top"><h3>CarbonMail</h3><span class="yr mono">Dragon Hacks 2026</span></div>
+            <p>My hackathon project for Dragon Hacks 2026.</p>
+            <div class="tags"><span>typescript</span><span>hackathon</span></div>
+          </a>
+          <a class="card" href="https://github.com/AndrewLukmantara/Fixing-Andy-s-Life" target="_blank" rel="noopener">
+            <div class="card-art"><canvas data-art="game"></canvas></div>
+            <div class="card-top"><h3>Fixing Andy's Life</h3><span class="yr mono">game</span></div>
+            <p>A story game that promotes a healthy lifestyle for teens and kids. It follows Andy, a 16-year-old who gets his health back on track.</p>
+            <div class="tags"><span>swift</span><span>story game</span></div>
+          </a>
+          <a class="card" href="https://github.com/AndrewLukmantara/hk-announcement-alpha" target="_blank" rel="noopener">
+            <div class="card-art"><canvas data-art="announce"></canvas></div>
+            <div class="card-top"><h3>HK Announcement Alpha</h3><span class="yr mono">quant research</span></div>
+            <p>Do Hong Kong Stock Exchange announcements predict returns, and more so when mainland investors buy through Stock Connect? A pipeline that scrapes HKEXnews filings in English and Chinese, scores them with an LLM, then runs an event study and a backtest after trading costs.</p>
+            <div class="tags"><span>python</span><span>llm scoring</span><span>event study</span><span>backtesting</span></div>
+          </a>
+          <a class="card" href="https://github.com/AndrewLukmantara/Iris-Flower-Classification" target="_blank" rel="noopener">
+            <div class="card-art"><canvas data-art="flower"></canvas></div>
+            <div class="card-top"><h3>Iris Flower Classification</h3><span class="yr mono">ml</span></div>
+            <p>Classifies iris flowers with a Random Forest classifier from scikit-learn.</p>
+            <div class="tags"><span>python</span><span>scikit-learn</span><span>jupyter</span></div>
+          </a>
+          <a class="card" href="https://github.com/AndrewLukmantara/My-First-ML-Project" target="_blank" rel="noopener">
+            <div class="card-art"><canvas data-art="chart"></canvas></div>
+            <div class="card-top"><h3>My First ML Project</h3><span class="yr mono">ml</span></div>
+            <p>Linear regression implemented step by step, where my machine learning started.</p>
+            <div class="tags"><span>python</span><span>jupyter</span></div>
+          </a>
+          <a class="card" href="https://github.com/AndrewLukmantara/Fitness-Website" target="_blank" rel="noopener">
+            <div class="card-art"><canvas data-art="fitness"></canvas></div>
+            <div class="card-top"><h3>Fitness Website</h3><span class="yr mono">competition</span></div>
+            <p>A fitness site built for the qualifier round of the Penabur Coding Competition.</p>
+            <div class="tags"><span>html</span><span>css</span><span>javascript</span></div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="frame" id="about" style="padding-top:0">
+    <div class="wrap">
+      <div class="frame-name mono"><span>Frame · about</span><span>auto layout</span></div>
+      <div class="frame-box about">
+        <div>
+          <h2>hi, i'm drew</h2>
+          <p>I make small things on the internet because it's fun. Most of them start late at night with "what if" and end with something that spins, glows or makes a noise.</p>
+          <p class="dim">I like 3D on the web, smooth motion, and projects small enough to finish in a weekend.</p>
+        </div>
+        <ul class="layers" aria-label="Tools I use">
+          <li class="head"><span>Layers</span><span>tools</span></li>
+          <li><span>Python</span><span>ml + scripts</span></li>
+          <li><span>scikit-learn</span><span>models</span></li>
+          <li><span>TypeScript</span><span>web apps</span></li>
+          <li><span>Swift</span><span>games</span></li>
+          <li><span>HTML · CSS · JS</span><span>websites</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="frame" id="contact" style="padding-top:0">
+    <div class="wrap">
+      <div class="frame-name mono"><span>Frame · contact</span><span>open to ideas</span></div>
+      <div class="frame-box contact">
+        <h2>say hi</h2>
+        <ul class="contacts">
+          <li>
+            <span class="c-label mono">email</span>
+            <code id="email">andrewlukmantara@gmail.com</code>
+            <button class="btn copy" type="button" data-copy="email">Copy</button>
+          </li>
+          <li>
+            <span class="c-label mono">linkedin</span>
+            <code>linkedin.com/in/andrew-lukmantara</code>
+            <a class="btn" href="https://www.linkedin.com/in/andrew-lukmantara" target="_blank" rel="noopener">Open ↗</a>
+          </li>
+          <li>
+            <span class="c-label mono">github</span>
+            <code>github.com/AndrewLukmantara</code>
+            <a class="btn" href="https://github.com/AndrewLukmantara?tab=repositories" target="_blank" rel="noopener">Open ↗</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap mono">
+    <span>drew's portfolio · built at night</span>
+    <a href="#top">back to top ↑</a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(() => {
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const hasGsap = typeof gsap !== "undefined";
+  if (hasGsap && typeof ScrollTrigger !== "undefined") gsap.registerPlugin(ScrollTrigger);
+
+  /* ---------- smooth scroll ---------- */
+  if (!reduce && typeof Lenis !== "undefined" && hasGsap) {
+    try {
+      const lenis = new Lenis({ lerp: 0.09 });
+      lenis.on("scroll", () => window.ScrollTrigger && ScrollTrigger.update());
+      gsap.ticker.add((t) => lenis.raf(t * 1000));
+      gsap.ticker.lagSmoothing(0);
+      document.querySelectorAll('a[href^="#"]').forEach((a) => {
+        a.addEventListener("click", (e) => {
+          const el = document.querySelector(a.getAttribute("href"));
+          if (el) { e.preventDefault(); lenis.scrollTo(el, { offset: -60 }); }
+        });
+      });
+    } catch (e) {}
+  }
+
+  /* ---------- copy email ---------- */
+  document.querySelectorAll(".copy").forEach((copyBtn) => {
+    copyBtn.addEventListener("click", () => {
+      const el = document.getElementById(copyBtn.dataset.copy);
+      const reset = () => setTimeout(() => (copyBtn.textContent = "Copy"), 1600);
+      const done = () => { copyBtn.textContent = "Copied"; reset(); };
+      const fallback = () => {
+        const r = document.createRange(); r.selectNodeContents(el);
+        const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+        copyBtn.textContent = "Press Ctrl+C"; reset();
+      };
+      try { navigator.clipboard.writeText(el.textContent).then(done, fallback); } catch (e) { fallback(); }
+    });
+  });
+
+  /* ---------- 3D night house ---------- */
+  const canvas = document.getElementById("scene");
+  const hero = document.querySelector(".hero");
+  let scrollProg = 0, mouseX = 0, mouseY = 0;
+
+  if (typeof THREE !== "undefined") {
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.Fog(0x070e24, 40, 110);
+    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 400);
+
+    const world = new THREE.Group();
+    const house = new THREE.Group();
+    world.add(house);
+    scene.add(world);
+
+    const box = new THREE.BoxGeometry(1, 1, 1);
+    const cache = {};
+    const mat = (hex, glow = 0) => {
+      const k = hex + ":" + glow;
+      if (!cache[k]) cache[k] = new THREE.MeshStandardMaterial({
+        color: hex, roughness: 0.92, metalness: 0,
+        emissive: glow ? hex : 0x000000, emissiveIntensity: glow
+      });
+      return cache[k];
+    };
+    const taken = new Set();
+    const put = (x, y, z, m, group = house) => {
+      const key = x + "," + y + "," + z;
+      if (taken.has(key)) return;
+      taken.add(key);
+      const b = new THREE.Mesh(box, m);
+      b.position.set(x, y, z);
+      b.castShadow = true; b.receiveShadow = true;
+      group.add(b);
+      return b;
+    };
+
+    // seeded random so the island looks the same every visit
+    let seed = 7;
+    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+
+    const C = {
+      grass: [0x1b3166, 0x1f3a77, 0x182c5c],
+      dirt: [0x0f1c40, 0x122250, 0x0c1835],
+      path: 0x5d72a8,
+      wall: 0xe6ecfa,
+      trim: 0xaebde0,
+      roof: [0x22438f, 0x1c3a7f],
+      door: 0x2b4580,
+      win: 0xf4f7ff,
+      leaf: [0x2c56a8, 0x3361b8, 0x264b95],
+      trunk: 0x1a2a52,
+      lamp: 0xffffff
+    };
+
+    // floating island
+    const layers = [[0, 6], [-1, 5], [-2, 4], [-3, 3], [-4, 2], [-5, 1]];
+    for (const [y, r] of layers) {
+      for (let x = -r; x <= r; x++) for (let z = -r; z <= r; z++) {
+        const edge = Math.max(Math.abs(x), Math.abs(z)) === r;
+        if (y === 0 && Math.abs(x) === r && Math.abs(z) === r) continue;
+        if (y < 0 && edge && rnd() < 0.35) continue;
+        let m;
+        if (y === 0) m = (x === 0 && z >= 3) ? mat(C.path) : mat(C.grass[Math.floor(rnd() * 3)]);
+        else m = mat(C.dirt[Math.floor(rnd() * 3)]);
+        put(x, y, z, m);
+      }
+    }
+
+    // walls (x -3..3, z -2..2, y 1..4)
+    const windows = [];
+    for (let y = 1; y <= 4; y++) for (let x = -3; x <= 3; x++) for (let z = -2; z <= 2; z++) {
+      const shell = Math.abs(x) === 3 || Math.abs(z) === 2;
+      if (!shell) continue;
+      const corner = Math.abs(x) === 3 && Math.abs(z) === 2;
+      const isWinFB = Math.abs(z) === 2 && Math.abs(x) === 2 && (y === 2 || y === 3);
+      const isWinSide = Math.abs(x) === 3 && z === 0 && (y === 2 || y === 3);
+      const isDoor = z === 2 && x === 0 && (y === 1 || y === 2);
+      let m = corner || y === 4 ? mat(C.trim) : mat(C.wall);
+      if (isDoor) m = mat(C.door);
+      if (isWinFB || isWinSide) m = mat(C.win, 1.4);
+      const b = put(x, y, z, m);
+      if ((isWinFB || isWinSide) && b) windows.push(b);
+    }
+    // roof: stepped gable along x
+    for (let i = 0; i <= 3; i++) {
+      const y = 5 + i, zr = 3 - i;
+      for (let x = -4; x <= 4; x++) {
+        put(x, y, zr, mat(C.roof[(x + i) & 1]));
+        if (zr !== 0) put(x, y, -zr, mat(C.roof[(x + i + 1) & 1]));
+      }
+      // gable fill
+      for (let z = -(2 - i); z <= 2 - i; z++) {
+        const attic = i === 1 && z === 0;
+        put(3, y, z, attic ? mat(C.win, 1.4) : mat(C.wall));
+        put(-3, y, z, attic ? mat(C.win, 1.4) : mat(C.wall));
+      }
+    }
+    // chimney
+    for (let y = 6; y <= 8; y++) put(2, y, -1, mat(C.trim));
+    // trees
+    const tree = (tx, tz, h) => {
+      for (let y = 1; y <= h; y++) put(tx, y, tz, mat(C.trunk));
+      for (let x = -1; x <= 1; x++) for (let z = -1; z <= 1; z++) for (let y = h + 1; y <= h + 2; y++) {
+        if (y === h + 2 && Math.abs(x) + Math.abs(z) === 2) continue;
+        put(tx + x, y, tz + z, mat(C.leaf[Math.floor(rnd() * 3)]));
+      }
+      put(tx, h + 3, tz, mat(C.leaf[1]));
+    };
+    tree(-4, 4, 2);
+    tree(4, -4, 3);
+    // lamp post by the path
+    put(2, 1, 4, mat(C.trunk)); put(2, 2, 4, mat(C.trunk));
+    put(2, 3, 4, mat(C.lamp, 2));
+
+    house.position.y = -2;
+
+    // chimney smoke puffs
+    const smokeMat = new THREE.MeshStandardMaterial({ color: 0xcdd8f5, transparent: true, opacity: 0.6, roughness: 1 });
+    const puffs = [];
+    for (let i = 0; i < 5; i++) {
+      const p = new THREE.Mesh(box, smokeMat.clone());
+      p.userData.t = i / 5;
+      house.add(p); puffs.push(p);
+    }
+
+    // block moon
+    const moon = new THREE.Mesh(new THREE.BoxGeometry(5, 5, 5), new THREE.MeshBasicMaterial({ color: 0xf3f6ff }));
+    moon.position.set(-26, 24, -40);
+    scene.add(moon);
+    const halo = new THREE.Mesh(new THREE.BoxGeometry(7, 7, 7), new THREE.MeshBasicMaterial({ color: 0x8db4ff, transparent: true, opacity: 0.12 }));
+    moon.add(halo);
+
+    // stars
+    const starGeo = new THREE.BufferGeometry();
+    const N = 900, pos = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+      const r = 70 + Math.random() * 60, th = Math.random() * Math.PI * 2, ph = Math.acos(Math.random() * 1.6 - 0.6);
+      pos[i * 3] = r * Math.sin(ph) * Math.cos(th);
+      pos[i * 3 + 1] = Math.abs(r * Math.cos(ph)) - 10;
+      pos[i * 3 + 2] = r * Math.sin(ph) * Math.sin(th);
+    }
+    starGeo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({ color: 0xffffff, size: 0.35, transparent: true, opacity: 0.85, fog: false }));
+    scene.add(stars);
+
+    // lights
+    scene.add(new THREE.AmbientLight(0x3b5aa6, 0.55));
+    scene.add(new THREE.HemisphereLight(0x9fbaff, 0x070e24, 0.45));
+    const moonLight = new THREE.DirectionalLight(0xd6e3ff, 1.0);
+    moonLight.position.set(-14, 22, 10);
+    moonLight.castShadow = true;
+    moonLight.shadow.mapSize.set(1024, 1024);
+    Object.assign(moonLight.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12, near: 1, far: 60 });
+    moonLight.shadow.bias = -0.0015;
+    scene.add(moonLight);
+    const glowA = new THREE.PointLight(0xeaf1ff, 1.3, 9); glowA.position.set(0, 0.8, 3.6); house.add(glowA);
+    const glowB = new THREE.PointLight(0xeaf1ff, 1.0, 9); glowB.position.set(4.2, 0.8, 0); house.add(glowB);
+    const lampLight = new THREE.PointLight(0xffffff, 1.4, 8); lampLight.position.set(2, 1.2, 4.8); house.add(lampLight);
+
+    // sizing
+    const resize = () => {
+      const w = hero.clientWidth, h = hero.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    };
+    resize();
+    addEventListener("resize", resize);
+
+    hero.addEventListener("pointermove", (e) => {
+      const r = hero.getBoundingClientRect();
+      mouseX = (e.clientX - r.left) / r.width - 0.5;
+      mouseY = (e.clientY - r.top) / r.height - 0.5;
+      coords.textContent = `X ${Math.round(e.clientX - r.left)} · Y ${Math.round(e.clientY - r.top)} · 100%`;
+    });
+    const coords = document.getElementById("coords");
+
+    let visible = true;
+    new IntersectionObserver(([en]) => (visible = en.isIntersecting)).observe(hero);
+
+    // a window that switches on and off, like someone is home
+    let flickerAt = 3;
+    const clock = new THREE.Clock();
+    let smX = 0, smY = 0;
+    const tick = () => {
+      requestAnimationFrame(tick);
+      if (!visible) return;
+      const t = clock.getElapsedTime();
+      smX += (mouseX - smX) * 0.05;
+      smY += (mouseY - smY) * 0.05;
+
+      const far = camera.aspect < 0.8 ? 1.75 : camera.aspect < 1.2 ? 1.3 : 1;
+      const d = 34 * far + scrollProg * 6;
+      camera.position.set(d * 0.55, 12 + smY * 3 - scrollProg * 4, d * 0.82);
+      camera.lookAt(0, 6.2 - scrollProg * 2, 0);
+
+      world.rotation.y = -0.35 + (reduce ? 0 : t * 0.07) + smX * 0.5 + scrollProg * 1.4;
+      world.position.y = reduce ? 0 : Math.sin(t * 0.9) * 0.25;
+      stars.rotation.y = t * 0.004;
+      moon.rotation.y = t * 0.1; moon.rotation.x = t * 0.05;
+
+      puffs.forEach((p) => {
+        const k = (p.userData.t + t * 0.12) % 1;
+        p.position.set(2 + Math.sin(k * 6 + p.userData.t * 9) * 0.4, 9 + k * 4, -1 - k * 0.8);
+        const s = 0.25 + k * 0.5; p.scale.setScalar(s);
+        p.material.opacity = 0.55 * (1 - k);
+      });
+
+      if (!reduce && t > flickerAt) {
+        const w = windows[Math.floor(Math.random() * windows.length)];
+        w.material = w.material === cache[C.win + ":1.4"] ? mat(C.trim) : mat(C.win, 1.4);
+        flickerAt = t + 2 + Math.random() * 4;
+      }
+      renderer.render(scene, camera);
+    };
+    tick();
+  }
+
+  /* ---------- little card art (2D voxel sketches) ---------- */
+  const drawCard = (cv) => {
+    const kind = cv.dataset.art;
+    const r = cv.getBoundingClientRect();
+    const dpr = Math.min(devicePixelRatio, 2);
+    cv.width = Math.max(1, r.width * dpr); cv.height = Math.max(1, r.height * dpr);
+    const g = cv.getContext("2d"); g.scale(dpr, dpr);
+    const W = r.width, H = r.height, u = Math.max(6, Math.floor(H / 14));
+    g.clearRect(0, 0, W, H);
+    // stars
+    for (let i = 0; i < 30; i++) { g.fillStyle = "rgba(243,246,255," + (0.2 + (i % 5) / 8) + ")"; g.fillRect((i * 97) % W, (i * 53) % (H * 0.6), 2, 2); }
+    const cx = Math.floor(W / 2 / u) * u, base = H - u * 2;
+    const block = (x, y, c) => { g.fillStyle = c; g.fillRect(cx + x * u, base - y * u, u - 1, u - 1); };
+    const W1 = "#f3f6ff", B1 = "#8db4ff", D1 = "#15275a", G1 = "#1f3a77", L1 = "#2c56a8";
+    if (kind === "mail") {
+      // envelope with a leaf stamp
+      for (let y = 1; y <= 7; y++) for (let x = -5; x <= 5; x++) {
+        const flap = Math.abs(x) === y - 2;
+        block(x, y, flap ? B1 : W1);
+      }
+      block(3, 6, L1); block(4, 6, L1); block(3, 5, L1); block(4, 5, "#3361b8");
+    } else if (kind === "game") {
+      // pixel character with a heart
+      for (let x = -6; x <= 6; x++) block(x, 0, G1);
+      [[0, 1], [0, 2], [-1, 1], [1, 1]].forEach(([x, y]) => block(x, y, D1));
+      for (let y = 3; y <= 5; y++) for (let x = -1; x <= 1; x++) block(x, y, B1);
+      block(-2, 4, B1); block(2, 4, B1);
+      for (let y = 6; y <= 7; y++) for (let x = -1; x <= 1; x++) block(x, y, W1);
+      [[4, 6], [6, 6], [4, 7], [5, 6], [6, 7], [5, 5]].forEach(([x, y]) => block(x, y, W1));
+    } else if (kind === "announce") {
+      // megaphone with sound waves
+      for (let y = 3; y <= 5; y++) block(-5, y, D1), block(-4, y, B1);
+      for (let i = 0; i < 4; i++) for (let y = 4 - i - 1; y <= 4 + i + 1; y++) block(-3 + i, y, W1);
+      [[3, 2], [3, 6], [4, 3], [4, 4], [4, 5], [5, 1], [5, 7], [6, 2], [6, 3], [6, 4], [6, 5], [6, 6]].forEach(([x, y]) => block(x, y, B1));
+    } else if (kind === "flower") {
+      // iris: stem, leaves, petals
+      for (let x = -6; x <= 6; x++) block(x, 0, G1);
+      for (let y = 1; y <= 5; y++) block(0, y, L1);
+      block(-1, 2, L1); block(-2, 3, L1); block(1, 3, L1); block(2, 4, L1);
+      [[-1, 6], [1, 6], [0, 7], [0, 8], [-2, 7], [2, 7], [-1, 8], [1, 8]].forEach(([x, y]) => block(x, y, B1));
+      block(0, 6, W1);
+    } else if (kind === "chart") {
+      // scatter points and a regression line
+      for (let y = 0; y <= 8; y++) block(-6, y, D1);
+      for (let x = -6; x <= 6; x++) block(x, 0, D1);
+      [[-4, 1], [-3, 3], [-2, 2], [-1, 4], [0, 3], [1, 5], [2, 4], [3, 6], [4, 7], [5, 6]].forEach(([x, y]) => block(x, y, W1));
+      for (let x = -5; x <= 5; x++) block(x, Math.round(1.6 + (x + 5) * 0.55), B1);
+    } else {
+      // dumbbell
+      for (let x = -3; x <= 3; x++) block(x, 4, W1);
+      [-5, -4, 4, 5].forEach((x) => { for (let y = 2; y <= 6; y++) block(x, y, Math.abs(x) === 5 ? D1 : B1); });
+      for (let x = -6; x <= 6; x++) block(x, 0, G1);
+    }
+  };
+  const arts = document.querySelectorAll("canvas[data-art]");
+  const redraw = () => arts.forEach(drawCard);
+  redraw();
+  addEventListener("resize", redraw);
+
+  /* ---------- motion ---------- */
+  if (!hasGsap) return;
+  const cursor = document.getElementById("cursor");
+
+  if (!reduce) {
+    gsap.from("h1 .line > span", { yPercent: 110, duration: 1.1, ease: "power4.out", stagger: 0.12, delay: 0.15 });
+    gsap.from(".sel .h, .sel-size", { scale: 0, duration: 0.4, ease: "back.out(3)", stagger: 0.05, delay: 0.9 });
+    gsap.from(".sub, .frame-tag", { y: 12, duration: 0.8, ease: "power3.out", delay: 0.5 });
+
+    // the "drew" cursor wanders around the canvas like a teammate in a Figma file
+    const wander = () => {
+      const w = hero.clientWidth, h = hero.clientHeight;
+      gsap.to(cursor, {
+        x: w * (0.15 + Math.random() * 0.7), y: h * (0.45 + Math.random() * 0.4),
+        duration: 1.6 + Math.random(), ease: "power2.inOut", onComplete: () => gsap.delayedCall(0.8 + Math.random(), wander)
+      });
+    };
+    gsap.set(cursor, { x: hero.clientWidth * 0.7, y: hero.clientHeight * 0.7 });
+    wander();
+
+    // marquee loop
+    const track = document.getElementById("marquee");
+    gsap.to(track, { xPercent: -50, duration: 28, ease: "none", repeat: -1 });
+
+    if (window.ScrollTrigger) {
+      ScrollTrigger.create({ trigger: hero, start: "top top", end: "bottom top", onUpdate: (s) => (scrollProg = s.progress) });
+      gsap.to(".hero-copy", { yPercent: -30, ease: "none", scrollTrigger: { trigger: hero, start: "top top", end: "bottom top", scrub: true } });
+      gsap.utils.toArray(".card").forEach((c, i) => {
+        gsap.from(c, { y: 50, duration: 0.9, ease: "power3.out", delay: (i % 2) * 0.08, scrollTrigger: { trigger: c, start: "top 92%" } });
+      });
+      gsap.utils.toArray(".frame-box h2").forEach((h) => {
+        gsap.from(h, { x: -24, duration: 0.8, ease: "power3.out", scrollTrigger: { trigger: h, start: "top 90%" } });
+      });
+    }
+  } else {
+    gsap.set(cursor, { x: hero.clientWidth * 0.68, y: hero.clientHeight * 0.68 });
+  }
+})();
+</script>
+</body>
+</html>
