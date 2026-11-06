@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Drew's portfolio: projects by Andrew Lukmantara, from hackathon apps to machine learning and quant research.">
 <title>Drew's Portfolio</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&display=swap">
 <style>
 /* Layout: one dark page in greys. The house holds the first screen; below it a single ledger column, a letter on a pale field, and a closing row. */
 :root {
@@ -19,8 +16,8 @@
   --paper: #e7e7e4;
   --paper-ink: #111111;
   --paper-muted: #55554f;
-  --f-display: "Newsreader", Georgia, "Times New Roman", serif;
-  --f-text: "Newsreader", Georgia, "Times New Roman", serif;
+  --f-display: "TeX Gyre Pagella", "Palatino Linotype", Palatino, "Book Antiqua", "URW Palladio L", Georgia, serif;
+  --f-text: var(--f-display);
   --step-small: 0.875rem;
   --step-body: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
   --step-lead: clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem);
@@ -40,7 +37,7 @@ body {
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
 .wrap { max-width: 1320px; margin-inline: auto; padding-left: var(--gutter-l); padding-right: var(--gutter-r); }
-h1, h2 { font-family: var(--f-display); font-weight: 300; letter-spacing: -0.025em; margin: 0; text-wrap: balance; }
+h1, h2 { font-family: var(--f-display); font-weight: 400; letter-spacing: -0.02em; margin: 0; text-wrap: balance; }
 h2 { font-size: var(--step-head); line-height: 1; }
 
 /* bar */
@@ -55,7 +52,7 @@ h2 { font-size: var(--step-head); line-height: 1; }
 
 .btn {
   display: inline-block; background: var(--ink); color: var(--paper-ink);
-  font: 500 1rem/1 var(--f-text); text-decoration: none; padding: 12px 18px;
+  font: 400 1rem/1 var(--f-text); text-decoration: none; padding: 12px 18px;
   border: 0; border-radius: 0; cursor: pointer; transition: transform .14s, background .18s;
 }
 .btn:hover { background: var(--paper); }
@@ -105,7 +102,7 @@ section { position: relative; }
 .sign em { display: block; font-size: 1.5rem; }
 .sign span { color: var(--paper-muted); font-size: var(--step-small); }
 .about-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); gap: 64px; align-items: start; }
-.tools h3 { font: 500 1rem/1.4 var(--f-text); margin: 0 0 12px; }
+.tools h3 { font: italic 400 1.0625rem/1.4 var(--f-text); margin: 0 0 12px; }
 .tools ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .tools li { display: flex; justify-content: space-between; gap: 16px; }
 .tools li span { color: var(--paper-muted); }
@@ -117,7 +114,7 @@ section { position: relative; }
 .contact-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 64px; align-items: start; }
 @media (max-width: 860px) { .contact-grid { grid-template-columns: minmax(0, 1fr); gap: 40px; } }
 .contact h2 { margin-bottom: 28px; }
-.statement { margin: 0; font-family: var(--f-display); font-weight: 300; font-size: clamp(1.5rem, 1rem + 1.6vw, 2.25rem); line-height: 1.15; max-width: 22ch; }
+.statement { margin: 0; font-family: var(--f-display); font-weight: 400; font-size: clamp(1.5rem, 1rem + 1.6vw, 2.25rem); line-height: 1.15; max-width: 26ch; }
 .links { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; }
 .links li { display: grid; gap: 2px; }
 .links .k { color: var(--muted); font-size: 1rem; }
@@ -126,17 +123,24 @@ section { position: relative; }
 .links a { text-underline-offset: 5px; text-decoration-thickness: 1px; transition: color .18s; }
 .links a:hover { color: var(--muted); }
 .copy {
-  background: none; border: 0; padding: 0; color: var(--muted); font: 500 1rem var(--f-text);
+  background: none; border: 0; padding: 0; color: var(--muted); font: 400 1rem var(--f-text);
   cursor: pointer; text-decoration: underline; text-underline-offset: 4px;
 }
 .copy:hover { color: var(--ink); }
 
 footer { background: var(--surface); }
-footer .wrap { padding-block: 48px 32px; }
-.big-name { font-family: var(--f-display); font-weight: 300; font-size: clamp(4rem, 19vw, 17rem); line-height: .8; letter-spacing: -0.04em; margin: 0; }
-.foot-line { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 32px; color: var(--muted); font-size: 1rem; }
+footer .wrap { padding-block: 88px 32px; }
+.foot-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 48px; }
+.foot-grid .foot-name { color: var(--ink); font-family: var(--f-display); font-size: var(--step-head); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 12px; }
+.foot-grid p { margin: 0; color: var(--muted); max-width: 34ch; }
+.foot-grid h3 { font: italic 400 1rem/1.4 var(--f-text); color: var(--muted); margin: 0 0 14px; }
+.foot-grid ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.foot-grid ul a { text-decoration: none; transition: color .18s; }
+.foot-grid ul a:hover { color: var(--muted); }
+.foot-line { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-top: 72px; color: var(--muted); font-size: 0.9375rem; }
 .foot-line a { text-decoration: none; }
 .foot-line a:hover { color: var(--ink); }
+@media (max-width: 720px) { .foot-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px 24px; } .foot-grid > div:first-child { grid-column: 1 / -1; } }
 
 @media (prefers-reduced-motion: reduce) { .btn, .row { transition: none; } }
 </style>
@@ -233,8 +237,25 @@ footer .wrap { padding-block: 48px 32px; }
 
 <footer>
   <div class="wrap">
-    <p class="big-name" aria-hidden="true">drew</p>
-    <div class="foot-line"><span>Andrew Lukmantara, 2026</span><a href="#top">Back to top</a></div>
+    <div class="foot-grid">
+      <div>
+        <p class="foot-name">Andrew Lukmantara</p>
+        <p>Drew for short. Student developer building hackathon apps, machine learning projects and quant research.</p>
+      </div>
+      <nav aria-label="Footer">
+        <h3>On this page</h3>
+        <ul><li><a href="#work">Work</a></li><li><a href="#about">About</a></li><li><a href="#contact">Contact</a></li></ul>
+      </nav>
+      <div>
+        <h3>Elsewhere</h3>
+        <ul>
+          <li><a href="https://github.com/AndrewLukmantara?tab=repositories" target="_blank" rel="noopener">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/andrew-lukmantara" target="_blank" rel="noopener">LinkedIn</a></li>
+          <li><a href="#contact">Email</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-line"><span>&copy; 2026 Andrew Lukmantara</span><a href="#top">Back to top &uarr;</a></div>
   </div>
 </footer>
 
