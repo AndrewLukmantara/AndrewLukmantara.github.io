@@ -94,14 +94,6 @@ section { position: relative; }
   .row { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 16px; padding-block: 14px; }
   .row .desc { grid-column: 1 / -1; grid-row: 2; }
 }
-.preview {
-  position: absolute; width: min(28vw, 380px); aspect-ratio: 4 / 3; max-width: 100%;
-  right: var(--gutter-r); top: 0; background: var(--surface);
-  opacity: 0; transition: opacity .15s, transform .25s; pointer-events: none;
-}
-.preview.on { opacity: 1; }
-.preview canvas { width: 100%; height: 100%; display: block; }
-@media (max-width: 1080px) { .preview { display: none; } }
 
 /* about: letter on a pale field */
 .about { background: var(--paper); color: var(--paper-ink); padding-block: clamp(72px, 8vw, 120px); }
@@ -146,7 +138,7 @@ footer .wrap { padding-block: 48px 32px; }
 .foot-line a { text-decoration: none; }
 .foot-line a:hover { color: var(--ink); }
 
-@media (prefers-reduced-motion: reduce) { .btn, .preview, .row { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .btn, .row { transition: none; } }
 </style>
 </head>
 <body>
@@ -177,28 +169,27 @@ footer .wrap { padding-block: 48px 32px; }
       <div class="work-col">
         <h2>Work</h2>
         <ul class="ledger">
-          <li><a class="row" data-art="mail" href="https://github.com/AndrewLukmantara/CarbonMail" target="_blank" rel="noopener">
+          <li><a class="row" href="https://github.com/AndrewLukmantara/CarbonMail" target="_blank" rel="noopener">
             <span class="name">CarbonMail</span><span class="desc">Hackathon app for Dragon Hacks 2026</span><span class="lang">TypeScript</span>
           </a></li>
-          <li><a class="row" data-art="announce" href="https://github.com/AndrewLukmantara/hk-announcement-alpha" target="_blank" rel="noopener">
+          <li><a class="row" href="https://github.com/AndrewLukmantara/hk-announcement-alpha" target="_blank" rel="noopener">
             <span class="name">HK Announcement Alpha</span><span class="desc">Do HKEX filings predict stock returns?</span><span class="lang">Python</span>
           </a></li>
-          <li><a class="row" data-art="game" href="https://github.com/AndrewLukmantara/Fixing-Andy-s-Life" target="_blank" rel="noopener">
+          <li><a class="row" href="https://github.com/AndrewLukmantara/Fixing-Andy-s-Life" target="_blank" rel="noopener">
             <span class="name">Fixing Andy's Life</span><span class="desc">A story game about getting healthy</span><span class="lang">Swift</span>
           </a></li>
-          <li><a class="row" data-art="flower" href="https://github.com/AndrewLukmantara/Iris-Flower-Classification" target="_blank" rel="noopener">
+          <li><a class="row" href="https://github.com/AndrewLukmantara/Iris-Flower-Classification" target="_blank" rel="noopener">
             <span class="name">Iris Classification</span><span class="desc">A Random Forest classifier in scikit-learn</span><span class="lang">Python</span>
           </a></li>
-          <li><a class="row" data-art="chart" href="https://github.com/AndrewLukmantara/My-First-ML-Project" target="_blank" rel="noopener">
+          <li><a class="row" href="https://github.com/AndrewLukmantara/My-First-ML-Project" target="_blank" rel="noopener">
             <span class="name">My First ML Project</span><span class="desc">Linear regression, step by step</span><span class="lang">Python</span>
           </a></li>
-          <li><a class="row" data-art="fitness" href="https://github.com/AndrewLukmantara/Fitness-Website" target="_blank" rel="noopener">
+          <li><a class="row" href="https://github.com/AndrewLukmantara/Fitness-Website" target="_blank" rel="noopener">
             <span class="name">Fitness Website</span><span class="desc">Penabur Coding Competition entry</span><span class="lang">HTML, CSS, JS</span>
           </a></li>
         </ul>
       </div>
     </div>
-    <div class="preview" id="preview" aria-hidden="true"><canvas></canvas></div>
   </section>
 
   <section class="about" id="about">
@@ -500,64 +491,6 @@ footer .wrap { padding-block: 48px 32px; }
     };
     tick();
   }
-
-  /* ---------- project previews (drawn in blocks, like the house) ---------- */
-  const drawArt = (cv, kind) => {
-    const r = cv.getBoundingClientRect();
-    const dpr = Math.min(devicePixelRatio, 2);
-    cv.width = Math.max(1, r.width * dpr); cv.height = Math.max(1, r.height * dpr);
-    const g = cv.getContext("2d"); g.scale(dpr, dpr);
-    const W = r.width, H = r.height, u = Math.max(6, Math.floor(H / 14));
-    g.clearRect(0, 0, W, H);
-    const cx = Math.floor(W / 2 / u) * u, base = H - u * 2;
-    const block = (x, y, c) => { g.fillStyle = c; g.fillRect(cx + x * u, base - y * u, u - 1, u - 1); };
-    const W1 = "#f1f1ef", B1 = "#a3a3a0", D1 = "#3a3a3a", G1 = "#2e2e2e", L1 = "#6f6f6f";
-    if (kind === "mail") {
-      for (let y = 1; y <= 7; y++) for (let x = -5; x <= 5; x++) block(x, y, Math.abs(x) === y - 2 ? B1 : W1);
-      block(3, 6, L1); block(4, 6, L1); block(3, 5, L1); block(4, 5, D1);
-    } else if (kind === "game") {
-      for (let x = -6; x <= 6; x++) block(x, 0, G1);
-      [[0, 1], [0, 2], [-1, 1], [1, 1]].forEach(([x, y]) => block(x, y, D1));
-      for (let y = 3; y <= 5; y++) for (let x = -1; x <= 1; x++) block(x, y, B1);
-      block(-2, 4, B1); block(2, 4, B1);
-      for (let y = 6; y <= 7; y++) for (let x = -1; x <= 1; x++) block(x, y, W1);
-      [[4, 6], [6, 6], [4, 7], [5, 6], [6, 7], [5, 5]].forEach(([x, y]) => block(x, y, W1));
-    } else if (kind === "announce") {
-      for (let y = 3; y <= 5; y++) block(-5, y, D1), block(-4, y, B1);
-      for (let i = 0; i < 4; i++) for (let y = 4 - i - 1; y <= 4 + i + 1; y++) block(-3 + i, y, W1);
-      [[3, 2], [3, 6], [4, 3], [4, 4], [4, 5], [5, 1], [5, 7], [6, 2], [6, 3], [6, 4], [6, 5], [6, 6]].forEach(([x, y]) => block(x, y, B1));
-    } else if (kind === "flower") {
-      for (let x = -6; x <= 6; x++) block(x, 0, G1);
-      for (let y = 1; y <= 5; y++) block(0, y, L1);
-      block(-1, 2, L1); block(-2, 3, L1); block(1, 3, L1); block(2, 4, L1);
-      [[-1, 6], [1, 6], [0, 7], [0, 8], [-2, 7], [2, 7], [-1, 8], [1, 8]].forEach(([x, y]) => block(x, y, B1));
-      block(0, 6, W1);
-    } else if (kind === "chart") {
-      for (let y = 0; y <= 8; y++) block(-6, y, D1);
-      for (let x = -6; x <= 6; x++) block(x, 0, D1);
-      [[-4, 1], [-3, 3], [-2, 2], [-1, 4], [0, 3], [1, 5], [2, 4], [3, 6], [4, 7], [5, 6]].forEach(([x, y]) => block(x, y, W1));
-      for (let x = -5; x <= 5; x++) block(x, Math.round(1.6 + (x + 5) * 0.55), B1);
-    } else {
-      for (let x = -3; x <= 3; x++) block(x, 4, W1);
-      [-5, -4, 4, 5].forEach((x) => { for (let y = 2; y <= 6; y++) block(x, y, Math.abs(x) === 5 ? D1 : B1); });
-      for (let x = -6; x <= 6; x++) block(x, 0, G1);
-    }
-  };
-  const preview = document.getElementById("preview");
-  const pvCanvas = preview.querySelector("canvas");
-  const work = document.getElementById("work");
-  const show = (row) => {
-    if (getComputedStyle(preview).display === "none") return;
-    preview.style.top = (row.getBoundingClientRect().top - work.getBoundingClientRect().top) + "px";
-    preview.classList.add("on");
-    drawArt(pvCanvas, row.dataset.art);
-  };
-  document.querySelectorAll(".row").forEach((row) => {
-    row.addEventListener("mouseenter", () => show(row));
-    row.addEventListener("focus", () => show(row));
-  });
-  document.querySelector(".ledger").addEventListener("mouseleave", () => preview.classList.remove("on"));
-  document.querySelector(".ledger").addEventListener("focusout", () => preview.classList.remove("on"));
 
   /* ---------- motion: one entrance per section part ---------- */
   if (!hasGsap || reduce) return;
