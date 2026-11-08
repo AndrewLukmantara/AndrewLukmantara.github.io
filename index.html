@@ -54,7 +54,15 @@ section { position: relative; padding-block: 56px; }
 h1 { font-size: var(--title); line-height: 1.3; letter-spacing: -0.005em; }
 .sub { margin: 2px 0 0; color: var(--muted); }
 .stage { margin: 36px auto 0; width: 100%; aspect-ratio: 16 / 10; max-width: 100%; background: var(--surface); }
-#scene { width: 100%; height: 100%; display: block; }
+#scene { width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: pan-y; }
+.kit { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; margin-top: 12px; font-size: var(--small); }
+.kit button {
+  display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 4px 0;
+  font: inherit; color: var(--muted); cursor: pointer; transition: color .18s;
+}
+.kit button:hover, .kit button[aria-pressed="true"] { color: var(--ink); }
+.kit button[aria-pressed="true"] { text-decoration: underline; text-underline-offset: 4px; }
+.kit i { width: 10px; height: 10px; display: inline-block; }
 .caption { margin: 10px 0 0; color: var(--muted); font-size: var(--small); font-style: italic; }
 .intro { margin: 40px 0 0; text-align: left; }
 
@@ -132,7 +140,16 @@ footer a:hover { color: var(--ink); }
       <h1>i build projects for fun</h1>
       <p class="sub">drew's portfolio</p>
       <div class="stage" id="stage"><canvas id="scene" role="img" aria-label="A blocky voxel house on a floating island under a night sky"></canvas></div>
-      <p class="caption">a house of cubes, built in three.js. move your mouse over it.</p>
+      <div class="kit" id="kit" role="toolbar" aria-label="Build tools" hidden>
+        <button type="button" data-tool="wall" aria-pressed="true"><i style="background:#e4e4e2"></i>Wall</button>
+        <button type="button" data-tool="roof" aria-pressed="false"><i style="background:#4a4a4a"></i>Roof</button>
+        <button type="button" data-tool="glass" aria-pressed="false"><i style="background:#ffffff"></i>Glass</button>
+        <button type="button" data-tool="leaf" aria-pressed="false"><i style="background:#575757"></i>Leaf</button>
+        <button type="button" data-tool="stone" aria-pressed="false"><i style="background:#6f6f6f"></i>Stone</button>
+        <button type="button" data-tool="break" aria-pressed="false">Break</button>
+        <button type="button" id="reset">Reset</button>
+      </div>
+      <p class="caption">click to place a block, shift-click or pick Break to remove one, drag to turn the island.</p>
       <p class="intro">I'm Andrew Lukmantara, Drew for short. I build hackathon apps, machine learning projects and quant research, mostly in Python and TypeScript.</p>
     </div>
   </section>
@@ -254,7 +271,6 @@ footer a:hover { color: var(--ink); }
   /* ---------- 3D night house ---------- */
   const canvas = document.getElementById("scene");
   const hero = document.getElementById("stage");
-  let scrollProg = 0, mouseX = 0, mouseY = 0;
 
   if (typeof THREE !== "undefined") {
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -281,17 +297,19 @@ footer a:hover { color: var(--ink); }
       });
       return cache[k];
     };
-    const taken = new Set();
-    const put = (x, y, z, m, group = house) => {
-      const key = x + "," + y + "," + z;
-      if (taken.has(key)) return;
-      taken.add(key);
+    const taken = new Map();
+    const key = (v) => v.x + "," + v.y + "," + v.z;
+    const put = (x, y, z, m) => {
+      const k = x + "," + y + "," + z;
+      if (taken.has(k)) return;
       const b = new THREE.Mesh(box, m);
       b.position.set(x, y, z);
       b.castShadow = true; b.receiveShadow = true;
-      group.add(b);
+      taken.set(k, b);
+      house.add(b);
       return b;
     };
+    const remove = (b) => { taken.delete(key(b.position)); house.remove(b); };
 
     // seeded random so the island looks the same every visit
     let seed = 7;
@@ -311,6 +329,9 @@ footer a:hover { color: var(--ink); }
       lamp: 0xffffff
     };
 
+    const windows = [];
+    const build = () => {
+    seed = 7; windows.length = 0;
     // floating island
     const layers = [[0, 6], [-1, 5], [-2, 4], [-3, 3], [-4, 2], [-5, 1]];
     for (const [y, r] of layers) {
@@ -326,7 +347,6 @@ footer a:hover { color: var(--ink); }
     }
 
     // walls (x -3..3, z -2..2, y 1..4)
-    const windows = [];
     for (let y = 1; y <= 4; y++) for (let x = -3; x <= 3; x++) for (let z = -2; z <= 2; z++) {
       const shell = Math.abs(x) === 3 || Math.abs(z) === 2;
       if (!shell) continue;
@@ -370,6 +390,8 @@ footer a:hover { color: var(--ink); }
     // lamp post by the path
     put(2, 1, 4, mat(C.trunk)); put(2, 2, 4, mat(C.trunk));
     put(2, 3, 4, mat(C.lamp, 2));
+    };
+    build();
 
     house.position.y = -2;
 
@@ -418,10 +440,62 @@ footer a:hover { color: var(--ink); }
     resize();
     addEventListener("resize", resize);
 
-    hero.addEventListener("pointermove", (e) => {
-      const r = hero.getBoundingClientRect();
-      mouseX = (e.clientX - r.left) / r.width - 0.5;
-      mouseY = (e.clientY - r.top) / r.height - 0.5;
+    // building: click adds a block on the face you point at; shift-click, right-click or Break removes one; drag turns the island
+    const palette = { wall: [C.wall, 0], roof: [C.roof[0], 0], glass: [C.win, 1.4], leaf: [C.leaf[1], 0], stone: [C.path, 0] };
+    let tool = "wall", yaw = 0, spin = 0, touched = false, down = null;
+    const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+    const ghost = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.04, 1.04, 1.04)), new THREE.LineBasicMaterial({ color: 0xffffff }));
+    ghost.visible = false; house.add(ghost);
+    const isBreak = (e) => tool === "break" || e.shiftKey || e.button === 2;
+    const pick = (e, breaking) => {
+      const r = canvas.getBoundingClientRect();
+      ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      ray.setFromCamera(ndc, camera);
+      const hit = ray.intersectObjects([...taken.values()])[0];
+      if (!hit) return null;
+      if (breaking) return { block: hit.object, at: hit.object.position };
+      const at = hit.object.position.clone().add(hit.face.normal).round();
+      // shortcut: fixed 21 x 21 x 22 build area, widen if people want bigger builds
+      if (taken.has(key(at)) || Math.abs(at.x) > 10 || Math.abs(at.z) > 10 || at.y < -7 || at.y > 14) return null;
+      return { at };
+    };
+    canvas.addEventListener("contextmenu", (e) => e.preventDefault());
+    canvas.addEventListener("pointerdown", (e) => {
+      down = { x: e.clientX, y: e.clientY, yaw, moved: false };
+      canvas.setPointerCapture(e.pointerId);
+    });
+    canvas.addEventListener("pointermove", (e) => {
+      if (down) {
+        if (Math.abs(e.clientX - down.x) > 5 || Math.abs(e.clientY - down.y) > 5) down.moved = true;
+        if (down.moved) { yaw = down.yaw + (e.clientX - down.x) * 0.01; touched = true; ghost.visible = false; }
+        return;
+      }
+      if (e.pointerType !== "mouse") return;
+      const p = pick(e, isBreak(e));
+      ghost.visible = !!p;
+      if (p) ghost.position.copy(p.at);
+    });
+    canvas.addEventListener("pointerup", (e) => {
+      const d = down; down = null;
+      if (!d || d.moved) return;
+      touched = true;
+      const breaking = isBreak(e);
+      const p = pick(e, breaking);
+      if (!p) return;
+      if (breaking) remove(p.block);
+      else put(p.at.x, p.at.y, p.at.z, mat(...palette[tool]));
+      ghost.visible = false;
+    });
+    canvas.addEventListener("pointerleave", () => (ghost.visible = false));
+
+    const kit = document.getElementById("kit");
+    kit.hidden = false;
+    kit.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      if (b.id === "reset") { [...taken.values()].forEach((m) => house.remove(m)); taken.clear(); build(); return; }
+      tool = b.dataset.tool;
+      kit.querySelectorAll("[data-tool]").forEach((x) => x.setAttribute("aria-pressed", x === b));
     });
 
     let visible = true;
@@ -430,20 +504,18 @@ footer a:hover { color: var(--ink); }
     // a window that switches on and off, like someone is home
     let flickerAt = 3;
     const clock = new THREE.Clock();
-    let smX = 0, smY = 0;
     const tick = () => {
       requestAnimationFrame(tick);
       if (!visible) return;
       const t = clock.getElapsedTime();
-      smX += (mouseX - smX) * 0.05;
-      smY += (mouseY - smY) * 0.05;
 
       const far = camera.aspect < 1.2 ? 1.3 : 1;
-      const d = 34 * far + scrollProg * 4;
-      camera.position.set(d * 0.55, 10 + smY * 3 - scrollProg * 3, d * 0.82);
+      const d = 34 * far;
+      camera.position.set(d * 0.55, 10, d * 0.82);
       camera.lookAt(0, 1.2, 0);
 
-      world.rotation.y = -0.35 + (reduce ? 0 : t * 0.07) + smX * 0.5 + scrollProg * 1.4;
+      if (!touched && !reduce) spin = t * 0.07;  // slow turn until someone starts building
+      world.rotation.y = -0.35 + spin + yaw;
       world.position.y = reduce ? 0 : Math.sin(t * 0.9) * 0.25;
       stars.rotation.y = t * 0.004;
 
@@ -468,7 +540,6 @@ footer a:hover { color: var(--ink); }
   if (!hasGsap || reduce) return;
   gsap.from(".stage, .caption", { y: 12, opacity: 0, duration: 0.9, ease: "power3.out", stagger: 0.08, delay: 0.1 });
   if (!window.ScrollTrigger) return;
-  ScrollTrigger.create({ trigger: hero, start: "top top", end: "bottom top", onUpdate: (s) => (scrollProg = s.progress) });
   ["#work", "#about", "#contact"].forEach((id) => {
     const parts = document.querySelectorAll(`${id} h2, ${id} .row, ${id} .letter p, ${id} .sign, ${id} .tools, ${id} .statement, ${id} .links li`);
     gsap.from(parts, { y: 12, opacity: 0, duration: 0.7, ease: "power3.out", stagger: 0.07, scrollTrigger: { trigger: id, start: "top 80%", once: true } });
