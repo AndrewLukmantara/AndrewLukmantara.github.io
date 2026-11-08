@@ -49,7 +49,7 @@ a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 3px; 
   padding-left: var(--gutter-l); padding-right: var(--gutter-r);
 }
 h1, h2, h3 { font-weight: 400; margin: 0; text-wrap: balance; }
-section { position: relative; padding-block: 56px; }
+section { position: relative; padding-block: 0 28px; }  /* each line then sits 28px from the content on both sides */
 
 /* nav */
 .top { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px 24px; padding-block: 28px 0; font-size: 0.9375rem; }
@@ -57,7 +57,7 @@ section { position: relative; padding-block: 56px; }
 .top a:hover, .top a[aria-current] { color: var(--ink); }
 
 /* hero */
-.hero { padding-block: 56px 32px; text-align: center; }
+.hero { padding-block: 56px 28px; text-align: center; }
 h1 { font-size: var(--title); line-height: 1.3; letter-spacing: -0.005em; }
 .sub { margin: 2px 0 0; color: var(--muted); }
 .stage { margin: 36px auto 0; width: 100%; aspect-ratio: 16 / 10; max-width: 100%; background: var(--surface); }
@@ -71,12 +71,11 @@ h1 { font-size: var(--title); line-height: 1.3; letter-spacing: -0.005em; }
 h2 { font-size: var(--body); font-style: italic; color: var(--muted); margin-bottom: 16px; }
 
 /* work */
-.work { padding-top: 32px; }
 /* a hairline across the text column opens each section */
 .work > .col::before, .about > .col::before, .contact > .col::before, footer > .col::before {
-  content: ""; display: block; flex: 0 0 100%; height: 1px; background: var(--line); margin-bottom: 32px;
+  content: ""; display: block; flex: 0 0 100%; height: 1px; background: var(--line); margin-bottom: 28px;
 }
-.ledger { list-style: none; margin: 0; padding: 0; }
+.ledger { list-style: none; margin: 0 0 -8px; padding: 0; }  /* cancels the last row's padding so the gap below matches the others */
 .row {
   display: grid; grid-template-columns: minmax(0, 12.5rem) minmax(0, 1fr) auto; gap: 20px;
   align-items: baseline; padding-block: 8px; text-decoration: none;
@@ -118,11 +117,12 @@ h2 { font-size: var(--body); font-style: italic; color: var(--muted); margin-bot
 }
 .copy:hover { color: var(--ink); }
 
-footer .col { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding-block: 32px 48px; color: var(--muted); font-size: var(--small); }
+footer .col { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding-block: 0 48px; color: var(--muted); font-size: var(--small); }
 footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
 footer a { text-decoration: none; transition: color .18s; }
 footer a:hover { color: var(--ink); }
 
+footer > .col::before { margin-bottom: 20px; }  /* plus the 8px flex gap = 28px */
 @media (prefers-reduced-motion: reduce) { .row .desc, .top a, footer a, .links a { transition: none; } }
 </style>
 </head>
