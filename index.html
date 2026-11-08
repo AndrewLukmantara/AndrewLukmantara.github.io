@@ -17,6 +17,7 @@
   --surface: #151515;
   --ink: #ececea;
   --muted: #9a9a96;
+  --line: #2a2a28;
   --f-text: "TeX Gyre Pagella", "Palatino Linotype", Palatino, "Book Antiqua", "URW Palladio L", Georgia, serif;
   --small: 0.875rem;
   --body: 1rem;
@@ -31,6 +32,7 @@
   --surface: #ececea;
   --ink: #161616;
   --muted: #66665f;
+  --line: #dcdcd7;
 }
 * { box-sizing: border-box; }
 html { background: var(--bg); }
@@ -70,6 +72,10 @@ h2 { font-size: var(--body); font-style: italic; color: var(--muted); margin-bot
 
 /* work */
 .work { padding-top: 32px; }
+/* a hairline across the text column opens each section */
+.work > .col::before, .about > .col::before, .contact > .col::before, footer > .col::before {
+  content: ""; display: block; flex: 0 0 100%; height: 1px; background: var(--line); margin-bottom: 32px;
+}
 .ledger { list-style: none; margin: 0; padding: 0; }
 .row {
   display: grid; grid-template-columns: minmax(0, 12.5rem) minmax(0, 1fr) auto; gap: 20px;
