@@ -92,10 +92,7 @@ h2 { font-size: var(--body); font-style: italic; color: var(--muted); margin-bot
 /* about */
 .tools h3 { color: var(--muted); }
 .letter p { margin: 0 0 14px; }
-.sign { margin-top: 24px; }
-.sign em { display: block; font-size: 1.125rem; }
-.sign span { color: var(--muted); font-size: var(--small); }
-.tools { margin-top: 40px; }
+.tools { margin-top: 28px; }
 .tools h3 { font-size: var(--body); font-style: italic; margin-bottom: 10px; }
 .tools ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 32px; }
 .tools li { display: flex; justify-content: space-between; gap: 12px; }
@@ -183,7 +180,6 @@ footer > .col::before { margin-bottom: 20px; }  /* plus the 8px flex gap = 28px 
         <p>I build things because I want to see if they work.</p>
         <p>Some of them started at hackathons, like CarbonMail at Dragon Hacks 2026. Some started as a notebook, like my first linear regression, and grew into bigger questions, like whether Hong Kong stock announcements predict returns.</p>
         <p>I write Python for machine learning and research, TypeScript for web apps, and Swift when a project wants to be a game.</p>
-        <div class="sign"><em>Drew</em><span>Andrew Lukmantara</span></div>
       </div>
       <div class="tools">
         <h3>What I use</h3>
@@ -603,7 +599,7 @@ footer > .col::before { margin-bottom: 20px; }  /* plus the 8px flex gap = 28px 
   gsap.from(".stage, .caption", { y: 12, opacity: 0, duration: 0.9, ease: "power3.out", stagger: 0.08, delay: 0.1 });
   if (!window.ScrollTrigger) return;
   ["#work", "#about", "#contact"].forEach((id) => {
-    const parts = document.querySelectorAll(`${id} h2, ${id} .row, ${id} .letter p, ${id} .sign, ${id} .tools, ${id} .statement, ${id} .links li`);
+    const parts = document.querySelectorAll(`${id} h2, ${id} .row, ${id} .letter p, ${id} .tools, ${id} .statement, ${id} .links li`);
     gsap.from(parts, { y: 12, opacity: 0, duration: 0.7, ease: "power3.out", stagger: 0.07, scrollTrigger: { trigger: id, start: "top 80%", once: true } });
   });
 })();
